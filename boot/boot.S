@@ -3,8 +3,7 @@
 .section ".text.boot"
 
 .global _start
-    mrs x0, mpidr_el1      // read processor ID from mpidr_el1 (Multiprocessor Affimity Register) register
-    and x0, x0, #0xff
+    bl get_processor_id
     cbz x0, master         // goto master when the processor ID is 0
     b proc_hang            // other processors are run in dead loop
 
