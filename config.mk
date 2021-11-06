@@ -9,6 +9,8 @@ export IMG := $(BIN)8.img
 BUILD_DIR = $(BUILD_ROOT)/kernel/ \
             $(BUILD_ROOT)/uart/ \
             $(BUILD_ROOT)/lib/ \
+            $(BUILD_ROOT)/timer/ \
+            $(BUILD_ROOT)/irq/ \
             $(BUILD_ROOT)/boot/ \
 
 export DEBUG = false

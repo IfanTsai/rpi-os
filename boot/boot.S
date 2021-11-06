@@ -48,4 +48,5 @@ clean_bss:
     ret
 
 proc_hang:
+    wfi
     b proc_hang
