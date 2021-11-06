@@ -16,4 +16,10 @@ distclean:
 	rm -f $(shell find -name "*.d")
 	rm -f $(IMG) $(ELF)
 
+PHONY += install
+install:
+	sudo mount /dev/sdc1 /mnt
+	sudo cp -r output/kernel8.img /mnt
+	sudo umount /mnt
+
 .PHONY: $(PHONY)
