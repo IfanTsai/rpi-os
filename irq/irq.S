@@ -6,10 +6,10 @@ exception_vector_table_init:
 
 .globl enable_irq
 enable_irq:
-    msr daifclr, #2     // DAIF: set I
+    msr daifclr, #2     // DAIF: clear I
     ret
 
 .globl disable_irq
 disable_irq:
-    msr daifset, #2    // DAIF: clear I
+    msr daifset, #2    // DAIF: set I
     ret

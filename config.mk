@@ -11,6 +11,7 @@ BUILD_DIR = $(BUILD_ROOT)/kernel/ \
             $(BUILD_ROOT)/lib/ \
             $(BUILD_ROOT)/timer/ \
             $(BUILD_ROOT)/irq/ \
+            $(BUILD_ROOT)/mm/ \
             $(BUILD_ROOT)/boot/ \
 
 export DEBUG = false

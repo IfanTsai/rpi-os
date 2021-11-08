@@ -18,6 +18,7 @@ LDFLAGS :=  -T $(LINK_SCRIPT)
 ifeq ($(DEBUG), true)
   VERSION = debug
   CFLAGS += -g
+  CFLAGS += -DDEBUG
 else
   VERSION = release
 endif
