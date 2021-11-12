@@ -1,14 +1,19 @@
 #ifndef __SCHED_H__
 #define __SCHED_H__
 
+#include "mm.h"
+
 #define THREAD_CPU_CONTEXT 0       // offset of cpu_context in task_struct
 
 #ifndef __ASSEMBLER__
 
 #define NR_TASKS 64
-#define THREAD_SIZE 4096
+#define THREAD_SIZE PAGE_SIZE
 
 #define TASK_RUNNING 0
+#define TASK_ZOMBIE  1
+
+#define PF_KTHREAD  (1 << 0)
 
 typedef struct {
     unsigned long x19;
@@ -32,10 +37,12 @@ typedef struct {
     long counter;
     long priority;
     long preempt_count;
-#ifdef DEBUG
-    long int_stack;
-    long registers_stack;
-    long stack;
+    unsigned long stack;
+    unsigned long flags;
+#ifdef DEBUG     // debug for print_memory_layout
+    long int_stack_count;
+    long registers_stack_count;
+    long stack_count;
 #endif
 } task_struct_t;
 
@@ -64,6 +71,7 @@ void switch_to(task_struct_t *next);
 void cpu_switch_to(task_struct_t *prev, task_struct_t *next);
 void schedule();
 void timer_tick();
+void exit_process();
 void print_memory_layout();
 
 #endif // __ASSEMBLER__

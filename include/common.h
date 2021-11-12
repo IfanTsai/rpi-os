@@ -9,4 +9,6 @@ typedef unsigned char byte;
 #define false 0
 typedef unsigned char bool;
 
+typedef unsigned long size_t;
+
 #endif

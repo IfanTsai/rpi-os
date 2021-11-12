@@ -1,11 +1,5 @@
 #include "sched.h"
-
-.globl ret_from_fork
-ret_from_fork:
-    bl schedule_tail
-    //bl print_memory_layout
-    mov x0, x20
-    blr x19     // should never return
+#include "entry.h"
 
 .globl cpu_switch_to
 cpu_switch_to:

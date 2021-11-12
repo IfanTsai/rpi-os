@@ -6,8 +6,10 @@
 #include "timer.h"
 #include "sched.h"
 #include "fork.h"
+#include "unistd.h"
+#include "errno.h"
 
-void process(char *array)
+void user_process(char *array)
 {
     for (;;) {
         for (int i = 0; i < 5; i++){
@@ -15,6 +17,50 @@ void process(char *array)
             delay(100000);
         }
     }
+}
+
+void kernel_user_process()
+{
+    write("user process started\r\n");
+
+    unsigned long stack = malloc();
+    if (stack < 0) {
+        printf("Error while allocating stack for process 1, errno = %d\r\n", errno);
+
+        return;
+    }
+
+    int err = clone((unsigned long)&user_process, (unsigned long)"12345", stack);
+    if (err < 0){
+        printf("Error while clonning process 1, errno = %d\r\n", errno);
+
+        return;
+    }
+
+    stack = malloc();
+    if (stack < 0) {
+        printf("Error while allocating stack for process 2, errno = %d\r\n", errno);
+
+        return;
+    }
+
+    err = clone((unsigned long)&user_process, (unsigned long)"abcd", stack);
+    if (err < 0){
+        printf("Error while clonning process 2, errno = %d\r\n", errno);
+
+        return;
+    }
+
+    exit();
+}
+
+void kernel_process()
+{
+    printf("kernel process started. el = %d\r\n", get_el());
+
+    int err = move_to_user_mode((unsigned long)&kernel_user_process);   // move init kernel process to user process
+    if (err < 0)
+        printf("Error while moving process to user mode\r\n");
 }
 
 void start_kernel()
@@ -30,19 +76,13 @@ void start_kernel()
     printf("processor id = %d\r\n", get_processor_id());
     printf("el = %d\r\n", get_el());
 
-    int res = copy_process((unsigned long)&process, (unsigned long)"12345", 3);   // set prioriy is 3
-    if (res) {
-        printf("error while starting process 1");
-        return;
-    }
+    int pid = copy_process(PF_KTHREAD, (unsigned long)&kernel_process, 0, 0, 0); // start init kernel process
+    if (pid < 0) {
+        println("error while starting kernel process");
 
-    res = copy_process((unsigned long)&process, (unsigned long)"abcde", 1);    // set prioriy is 1
-    if (res) {
-        printf("error while starting process 2");
         return;
     }
 
     for (;;)
-        //uart_putc(uart_getc());    // for input echo
         schedule();
 }

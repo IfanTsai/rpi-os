@@ -2,6 +2,7 @@
 #define __ENTRY_H__
 
 #define REGISTER_FRAME_SIZE     256      // size of all saved registers 
+#define S_X0                    0        // offset of x0 register in saved stack frame
 
 #define SYNC_INVALID_EL1t       0 
 #define IRQ_INVALID_EL1t        1 
@@ -23,5 +24,7 @@
 #define FIQ_INVALID_EL0_32      14 
 #define ERROR_INVALID_EL0_32    15 
 
+#define SYNC_ERROR              16
+#define SYSCALL_ERROR           17
 
 #endif

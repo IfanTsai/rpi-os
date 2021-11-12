@@ -203,3 +203,9 @@ void tfp_sprintf(char *s, char *fmt, ...)
 
     va_end(va);
 }
+
+void tfp_println(char *buf)
+{
+    tfp_printf(buf);
+    tfp_printf("\r\n");
+}

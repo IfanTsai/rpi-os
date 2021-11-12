@@ -65,8 +65,8 @@ void switch_to(task_struct_t *next)
     task_struct_t *prev = current;
     current = next;
 #ifdef DEBUG
-    if (next->stack == 0) {
-        next->stack = 1;
+    if (next->stack_count == 0) {
+        next->stack_count = 1;
         print_memory_layout();
     }
 #endif
@@ -89,18 +89,31 @@ void timer_tick()
     enable_irq();
 
 #ifdef DEBUG
-    current->int_stack++;
+    current->int_stack_count++;
     print_memory_layout();
 #endif
 
     _schedule();
 
 #ifdef DEBUG
-    current->int_stack--;
+    current->int_stack_count--;
     print_memory_layout();
 #endif
 
     disable_irq();
+}
+
+void exit_process()
+{
+    preempt_disable();
+
+    current->state = TASK_ZOMBIE;
+    if (current->stack)
+        free_page(current->stack);
+
+    preempt_enable();
+
+    schedule();
 }
 
 void print_memory_layout()
@@ -119,17 +132,17 @@ void print_memory_layout()
             printf("           | task_struct %d          |\r\n", i);
             printf("           |------------------------|\r\n");
             printf("           |                        |\r\n");
-            for (int j = 0; j < p->int_stack; j++) {
+            for (int j = 0; j < p->int_stack_count; j++) {
                 printf("           |------------------------|\r\n");
                 printf("           | task %d stack (int)     |\r\n", i);
             }
 
-            if (p->registers_stack > 0) {
+            if (p->registers_stack_count > 0) {
                 printf("           |------------------------|\r\n");
                 printf("           | task %d saved registers |\r\n", i);
             }
 
-            if (p->stack > 0) {
+            if (p->stack_count > 0) {
                 printf("           |------------------------|\r\n");
                 printf("           | task %d stack          |\r\n", i);
             }
@@ -145,13 +158,13 @@ void print_memory_layout()
 void set_register_stack()
 {
 #ifdef DEBUG
-    current->registers_stack = 1;
+    current->registers_stack_count = 1;
 #endif
 }
 
 void clear_register_stack()
 {
 #ifdef DEBUG
-    current->registers_stack = 0;
+    current->registers_stack_count = 0;
 #endif
 }
