@@ -65,7 +65,7 @@ $(IMG): $(ELF)
 
 $(ELF): $(LINK_OBJ) $(LINK_SCRIPT)
 	@echo "------------------------------- build $(VERSION) version  ------------------------------------"
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) -o $@ $(filter %.o, $^)
 
 $(LINK_OBJ_DIR)/%_S.o: %.S
 	$(CC) $(CFLAGS) -I$(INCLUDE_PATH) -o $@ -c $(filter %.S, $^)

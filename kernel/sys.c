@@ -7,7 +7,7 @@ int sys_write(char *buf)
 {
     printf(buf);
 
-    return 1;
+    return 0;
 }
 
 int sys_clone(unsigned long stack)

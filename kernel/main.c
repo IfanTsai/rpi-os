@@ -12,7 +12,7 @@
 void user_process(char *array)
 {
     for (;;) {
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             uart_putc(array[i]);
             delay(100000);
         }
@@ -25,28 +25,28 @@ void kernel_user_process()
 
     unsigned long stack = malloc();
     if (stack < 0) {
-        printf("Error while allocating stack for process 1, errno = %d\r\n", errno);
+        printf("error while allocating stack for process 1, errno = %d\r\n", errno);
 
         return;
     }
 
     int err = clone((unsigned long)&user_process, (unsigned long)"12345", stack);
-    if (err < 0){
-        printf("Error while clonning process 1, errno = %d\r\n", errno);
+    if (err < 0) {
+        printf("error while clonning process 1, errno = %d\r\n", errno);
 
         return;
     }
 
     stack = malloc();
     if (stack < 0) {
-        printf("Error while allocating stack for process 2, errno = %d\r\n", errno);
+        printf("error while allocating stack for process 2, errno = %d\r\n", errno);
 
         return;
     }
 
-    err = clone((unsigned long)&user_process, (unsigned long)"abcd", stack);
-    if (err < 0){
-        printf("Error while clonning process 2, errno = %d\r\n", errno);
+    err = clone((unsigned long)&user_process, (unsigned long)"abcde", stack);
+    if (err < 0) {
+        printf("error while clonning process 2, errno = %d\r\n", errno);
 
         return;
     }
@@ -56,11 +56,11 @@ void kernel_user_process()
 
 void kernel_process()
 {
-    printf("kernel process started. el = %d\r\n", get_el());
+    printf("kernel process started, el = %d\r\n", get_el());
 
     int err = move_to_user_mode((unsigned long)&kernel_user_process);   // move init kernel process to user process
     if (err < 0)
-        printf("Error while moving process to user mode\r\n");
+        printf("error while moving process to user mode\r\n");
 }
 
 void start_kernel()

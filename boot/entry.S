@@ -173,13 +173,13 @@ sc_tbl .req x27   // the pointer of system call table
 
 el0_svc:
     adr sc_tbl, sys_call_table
-    uxtw sc_no, w8              // uxtx: Zero-extend  32bit to 64bit
+    uxtw sc_no, w8              // uxtw: Zero-extend 32bit to 64bit
     mov sc_nr, #__NR_syscalls
     bl enable_irq
     cmp sc_no, sc_nr
     bhs err_sys
 
-    ldr x16, [sc_tbl, sc_no, lsl #3]  // sc_stbl + sc_no * 8
+    ldr x16, [sc_tbl, sc_no, lsl #3]  // sc_tbl + sc_no * 8
     blr x16
 
     bl disable_irq
