@@ -7,6 +7,7 @@ int call_sys_clone(unsigned long fn, unsigned long arg, unsigned long stack);
 _syscall0(long, malloc)
 _syscall0(int, exit)
 _syscall1(int, write, char *)
+_syscall1(int, priority, long)
 
 int clone(unsigned long fn, unsigned long arg, unsigned long stack)
 {

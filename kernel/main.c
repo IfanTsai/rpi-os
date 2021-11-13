@@ -9,8 +9,22 @@
 #include "unistd.h"
 #include "errno.h"
 
-void user_process(char *array)
+void user_process1(char *array)
 {
+    priority(3);
+
+    for (;;) {
+        for (int i = 0; i < 5; i++) {
+            uart_putc(array[i]);
+            delay(100000);
+        }
+    }
+}
+
+void user_process2(char *array)
+{
+    priority(1);
+
     for (;;) {
         for (int i = 0; i < 5; i++) {
             uart_putc(array[i]);
@@ -30,7 +44,7 @@ void kernel_user_process()
         return;
     }
 
-    int err = clone((unsigned long)&user_process, (unsigned long)"12345", stack);
+    int err = clone((unsigned long)&user_process1, (unsigned long)"12345", stack);
     if (err < 0) {
         printf("error while clonning process 1, errno = %d\r\n", errno);
 
@@ -44,7 +58,7 @@ void kernel_user_process()
         return;
     }
 
-    err = clone((unsigned long)&user_process, (unsigned long)"abcde", stack);
+    err = clone((unsigned long)&user_process2, (unsigned long)"abcde", stack);
     if (err < 0) {
         printf("error while clonning process 2, errno = %d\r\n", errno);
 

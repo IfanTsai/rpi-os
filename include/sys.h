@@ -1,12 +1,13 @@
 #ifndef __SYS_H__
 #define __SYS_H__
 
-#define __NR_syscalls    4
+#define __NR_syscalls    5
 
 #define __NR_write       0
 #define __NR_malloc      1
 #define __NR_clone       2
 #define __NR_exit        3
+#define __NR_priority    4
 
 #ifndef __ASSEMBLER__
 

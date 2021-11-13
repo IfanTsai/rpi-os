@@ -29,9 +29,17 @@ int sys_exit()
     return 0;
 }
 
+int sys_priroiry(long priority)
+{
+    current->priority = priority;
+
+    return 0;
+}
+
 void * const sys_call_table[] = {
     sys_write,
     sys_malloc,
     sys_clone,
     sys_exit,
+    sys_priroiry,
 };

@@ -166,6 +166,7 @@ el0_sync:
     lsr x24, x25,  #ESR_ELx_EC_SHIFT   // exception class
     cmp x24, #ESR_ELx_EC_SVC64
     beq el0_svc
+    handle_invalid_entry 0, SYNC_INVALID_EL0_64
 
 sc_nr  .req x25   // the number of system calls
 sc_no  .req x26   // system call number
