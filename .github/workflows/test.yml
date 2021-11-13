@@ -1,0 +1,22 @@
+name: Test for compile
+
+on: [push, pull_request]
+
+jobs:
+  compile:
+    name: compile rpi-os
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: set up env
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential gcc-aarch64-linux-gnu
+      
+      - name: make
+        run: |
+          make -j$(grep processor /proc/cpuinfo | awk '{field=$NF};END{print field+1}')
+          which output/kernel.elf
+          which output/kernel8.img
