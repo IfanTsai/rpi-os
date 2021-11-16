@@ -1,5 +1,5 @@
-#ifndef __SYSREGS_H__
-#define __SYSREGS_H__
+#ifndef __ARM_SYSREGS_H__
+#define __ARM_SYSREGS_H__
 
 // ***************************************
 // SCTLR_EL1, System Control Register (EL1)
@@ -46,6 +46,7 @@
 
 #define ESR_ELx_EC_SHIFT        26
 #define ESR_ELx_EC_SVC64        0x15
+#define ESR_ELx_EC_DABT_LOW     0x24
+#define ESR_ELx_EC_DABT_CUR     0x25
 
-
-#endif
+#endif  // !__ARM_SYSREGS_H__

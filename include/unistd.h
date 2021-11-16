@@ -4,7 +4,7 @@
 long malloc();
 int exit();
 int write(char *buf);
-int clone(unsigned long fn, unsigned long arg, unsigned long stack);
 int priority(long _priority);
+int fork();
 
 #endif // !__UNISTD_H__

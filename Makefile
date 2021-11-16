@@ -8,18 +8,24 @@ all:
 
 PHONY += clean
 clean:
-	rm -f $(shell find -name "*.o") $(IMG) $(ELF)
+	rm -f $(shell find -name "*.o" -o -name "*.dis") $(IMG) $(ELF)
 
 PHONY += distclean
 distclean:
 	rm -f $(shell find -name "*.o")
 	rm -f $(shell find -name "*.d")
+	rm -f $(shell find -name "*.dis")
 	rm -f $(IMG) $(ELF)
 
 PHONY += install
 install:
-	sudo mount /dev/sdc1 /mnt
-	sudo cp -r output/kernel8.img /mnt
-	sudo umount /mnt
+	@if [ ! -f $(IMG) ]; then \
+		echo "$(IMG) not found, please try to make!" ; \
+	else \
+		sudo mount /dev/sdc1 /mnt ; \
+		sudo cp -r $(IMG) /mnt ; \
+		sudo umount /mnt ;\
+		echo "succeed to install $(IMG)" ; \
+	fi
 
 .PHONY: $(PHONY)

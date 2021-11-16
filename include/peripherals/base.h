@@ -1,6 +1,9 @@
-#ifndef	_P_BASE_H
-#define	_P_BASE_H
+#ifndef __P_BASE_H__
+#define __P_BASE_H__
 
-#define PBASE 0x3F000000
+#include "mm.h"
 
-#endif  /*_P_BASE_H */
+#define DEVICE_BASE      0x3f000000
+#define PBASE            (VA_START + DEVICE_BASE)
+
+#endif  // !__P_BASE_H__

@@ -5,13 +5,11 @@
 
 #define __NR_write       0
 #define __NR_malloc      1
-#define __NR_clone       2
-#define __NR_exit        3
-#define __NR_priority    4
+#define __NR_exit        2
+#define __NR_priority    3
+#define __NR_fork        4
 
 #ifndef __ASSEMBLER__
-
-#include "errno.h"
 
 #define _syscall0(type, name) \
 type name() \
@@ -24,7 +22,6 @@ type name() \
     : "=&r" (__res) \
     : "r" (__NR_##name) \
     :); \
-    errno = -__res; \
     if (__res >= 0) \
         return (type) __res; \
     return -1; \
@@ -42,12 +39,10 @@ type name(atype a) \
     : "=&r" (__res) \
     : "r" (__NR_##name), "r" ((long)(a)) \
     :); \
-    errno = -__res; \
     if (__res >= 0) \
         return (type) __res; \
     return -1; \
 }
-
 
 #endif // !__ASSEMBLER__
 

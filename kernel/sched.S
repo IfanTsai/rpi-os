@@ -1,5 +1,4 @@
 #include "sched.h"
-#include "entry.h"
 
 .globl cpu_switch_to
 cpu_switch_to:

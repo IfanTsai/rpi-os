@@ -5,7 +5,7 @@
     .macro ventry label
     .align 7   // since every exception entry offset is 0x80, align to 2 ^ 7 bit
     b \label
-    .endm
+    .endm  // end .macro ventry
 
     .macro save_registers, el
     sub sp, sp, #REGISTER_FRAME_SIZE
@@ -81,6 +81,7 @@
     mov x0, #\type
     mrs x1, esr_el1    // the reason for the exception is saved in the esr_elx
     mrs x2, elr_el1    // the return address is saved in elr_elx 
+    mov x3, \el
     bl show_invalid_entry_message
     b err_hang
     .endm
@@ -96,7 +97,7 @@ exception_vector_table:
     ventry fiq_invalid_el1t          // FIQ EL1t
     ventry error_invalid_el1t        // Error EL1t
 
-    ventry sync_invalid_el1h         // Synchronous EL1h
+    ventry el_sync                   // Synchronous EL1h
     ventry el1_irq                   // IRQ EL1h, only realize it now !
     ventry fiq_invalid_el1h          // FIQ EL1h
     ventry error_invalid_el1h        // Error EL1h
@@ -150,6 +151,16 @@ fiq_invalid_el0_32:
 error_invalid_el0_32:
     handle_invalid_entry 0, ERROR_INVALID_EL0_32
 
+el_sync:
+    save_registers 1
+    mrs x1, esr_el1
+    lsr x24, x1, #ESR_ELx_EC_SHIFT // exception class
+    cmp x24, #ESR_ELx_EC_DABT_CUR
+    beq el1_da
+    handle_invalid_entry 1, SYNC_INVALID_EL1h
+el1_da:
+    handle_invalid_entry 1, DATA_ABORT_ERROR
+
 el1_irq:
     save_registers 1
     bl handle_irq
@@ -166,7 +177,22 @@ el0_sync:
     lsr x24, x25,  #ESR_ELx_EC_SHIFT   // exception class
     cmp x24, #ESR_ELx_EC_SVC64
     beq el0_svc
+    cmp x24, #ESR_ELx_EC_DABT_LOW        // data abort in EL0
+    beq el0_da
     handle_invalid_entry 0, SYNC_INVALID_EL0_64
+
+// page fault interrupt
+el0_da:
+    bl enable_irq
+    mrs x0, far_el1
+    mrs x1, esr_el1
+    bl do_mem_abort
+    cmp x0, 0
+    beq 1f
+    handle_invalid_entry 0, DATA_ABORT_ERROR
+1:
+    bl disable_irq
+    restore_registers 0
 
 sc_nr  .req x25   // the number of system calls
 sc_no  .req x26   // system call number

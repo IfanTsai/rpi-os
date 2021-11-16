@@ -22,9 +22,8 @@ typedef struct {
     unsigned long pstate;
 } pt_regs_t;
 
-int move_to_user_mode(unsigned long pc);
-int copy_process(unsigned long clone_flags, unsigned long fn, unsigned long arg,
-                    unsigned long stack, unsigned long priority);
+int move_to_user_mode(unsigned long start, unsigned long size, unsigned long pc);
+int copy_process(unsigned long clone_flags, unsigned long fn, unsigned long arg, unsigned long priority);
 
 static inline pt_regs_t *task_pt_regs(task_struct_t *task)
 {

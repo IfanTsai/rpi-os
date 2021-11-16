@@ -2,6 +2,7 @@
 #include "irq.h"
 #include "printf.h"
 #include "common.h"
+#include "utils.h"
 
 static task_struct_t init_task = INIT_TASK;
 task_struct_t *current = &init_task;
@@ -70,6 +71,8 @@ void switch_to(task_struct_t *next)
         print_memory_layout();
     }
 #endif
+    set_pgd(next->mm.pgd);
+
     cpu_switch_to(prev, next);
 }
 
@@ -108,8 +111,6 @@ void exit_process()
     preempt_disable();
 
     current->state = TASK_ZOMBIE;
-    if (current->stack)
-        free_page(current->stack);
 
     preempt_enable();
 

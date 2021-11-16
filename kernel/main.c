@@ -8,73 +8,19 @@
 #include "fork.h"
 #include "unistd.h"
 #include "errno.h"
-
-void user_process1(char *array)
-{
-    priority(3);
-
-    for (;;) {
-        for (int i = 0; i < 5; i++) {
-            uart_putc(array[i]);
-            delay(100000);
-        }
-    }
-}
-
-void user_process2(char *array)
-{
-    priority(1);
-
-    for (;;) {
-        for (int i = 0; i < 5; i++) {
-            uart_putc(array[i]);
-            delay(100000);
-        }
-    }
-}
-
-void kernel_user_process()
-{
-    write("user process started\r\n");
-
-    unsigned long stack = malloc();
-    if (stack < 0) {
-        printf("error while allocating stack for process 1, errno = %d\r\n", errno);
-
-        return;
-    }
-
-    int err = clone((unsigned long)&user_process1, (unsigned long)"12345", stack);
-    if (err < 0) {
-        printf("error while clonning process 1, errno = %d\r\n", errno);
-
-        return;
-    }
-
-    stack = malloc();
-    if (stack < 0) {
-        printf("error while allocating stack for process 2, errno = %d\r\n", errno);
-
-        return;
-    }
-
-    err = clone((unsigned long)&user_process2, (unsigned long)"abcde", stack);
-    if (err < 0) {
-        printf("error while clonning process 2, errno = %d\r\n", errno);
-
-        return;
-    }
-
-    exit();
-}
+#include "user.h"
 
 void kernel_process()
 {
     printf("kernel process started, el = %d\r\n", get_el());
 
-    int err = move_to_user_mode((unsigned long)&kernel_user_process);   // move init kernel process to user process
+    unsigned long start = (unsigned long)&user_start;
+    unsigned long end = (unsigned long)&user_end;
+    unsigned long process = (unsigned long)&user_process;
+
+    int err = move_to_user_mode(start, end - start, process - start);   // move init kernel process to user process
     if (err < 0)
-        printf("error while moving process to user mode\r\n");
+        printf("failed to move kernel process to user mode\r\n");
 }
 
 void start_kernel()
@@ -90,7 +36,7 @@ void start_kernel()
     printf("processor id = %d\r\n", get_processor_id());
     printf("el = %d\r\n", get_el());
 
-    int pid = copy_process(PF_KTHREAD, (unsigned long)&kernel_process, 0, 0, 0); // start init kernel process
+    int pid = copy_process(PF_KTHREAD, (unsigned long)&kernel_process, 0, 0); // start init kernel process
     if (pid < 0) {
         println("error while starting kernel process");
 

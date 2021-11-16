@@ -1,7 +1,7 @@
 #ifndef __ENTRY_H__
 #define __ENTRY_H__
 
-#define REGISTER_FRAME_SIZE     256      // size of all saved registers 
+#define REGISTER_FRAME_SIZE     272      // size of all saved registers
 #define S_X0                    0        // offset of x0 register in saved stack frame
 
 #define SYNC_INVALID_EL1t       0 
@@ -26,5 +26,6 @@
 
 #define SYNC_ERROR              16
 #define SYSCALL_ERROR           17
+#define DATA_ABORT_ERROR		18
 
 #endif

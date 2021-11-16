@@ -1,14 +1,13 @@
 #ifndef __SCHED_H__
 #define __SCHED_H__
 
-#include "mm.h"
 
 #define THREAD_CPU_CONTEXT 0       // offset of cpu_context in task_struct
 
 #ifndef __ASSEMBLER__
 
 #define NR_TASKS 64
-#define THREAD_SIZE PAGE_SIZE
+#define THREAD_SIZE 4096
 
 #define TASK_RUNNING 0
 #define TASK_ZOMBIE  1
@@ -31,14 +30,29 @@ typedef struct {
     unsigned long sp; 
 } cpu_context_t;
 
+#define MAX_PROCESS_PAGES     16
+
+typedef struct {
+    unsigned long phys_addr;
+    unsigned long virt_addr;
+} user_page_t;
+
+typedef struct {
+    unsigned long pgd;
+    int user_pages_count;
+    user_page_t user_pages[MAX_PROCESS_PAGES];
+    int kernel_pages_count;
+    unsigned long kernel_pages[MAX_PROCESS_PAGES];
+} mm_struct_t;
+
 typedef struct {
     cpu_context_t cpu_context;
     long state;
     long counter;
     long priority;
     long preempt_count;
-    unsigned long stack;
     unsigned long flags;
+    mm_struct_t mm;
 #ifdef DEBUG     // debug for print_memory_layout
     long int_stack_count;
     long registers_stack_count;
@@ -46,9 +60,17 @@ typedef struct {
 #endif
 } task_struct_t;
 
+#if 0
 #define INIT_TASK { \
 /* cpu context */ { 0 },  \
 /* state etc */ 0, 0, 1, 0, \
+}
+#endif
+
+#define INIT_TASK \
+/* cpu_context */ { { 0 }, \
+/* state etc */ 0, 0, 1, 0, PF_KTHREAD, \
+/* mm */ { 0, 0, {{ 0 }}, 0, { 0 }} \
 }
 
 extern task_struct_t *current;

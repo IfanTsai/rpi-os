@@ -27,11 +27,12 @@ static const char *entry_error_messages[] = {
 
     "SYNC_ERROR",
     "SYSCALL_ERROR",
+    "DATA_ABORT_ERROR",
 };
 
-void show_invalid_entry_message(int type, unsigned long esr, unsigned long address)
+void show_invalid_entry_message(int type, unsigned long esr, unsigned long address, unsigned int el)
 {
-    printf("%s, ESR: %x, address: %x\r\n", entry_error_messages[type], esr, address);
+    printf("%s, ESR: %x, address: %x, el: %d\r\n", entry_error_messages[type], esr, address, el);
 }
 
 void enable_interrupt_controller()

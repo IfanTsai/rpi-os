@@ -1,5 +1,5 @@
-#ifndef	_P_IRQ_H
-#define	_P_IRQ_H
+#ifndef __P_IRQ_H__
+#define __P_IRQ_H__
 
 #include "peripherals/base.h"
 
@@ -19,4 +19,4 @@
 #define SYSTEM_TIMER_IRQ_2  (1 << 2)
 #define SYSTEM_TIMER_IRQ_3  (1 << 3)
 
-#endif  /*_P_IRQ_H */
+#endif  // !__P_IRQ_H__

@@ -10,7 +10,7 @@ STRIP       = $(CROSS_COMPILE)strip
 OBJCOPY     = $(CROSS_COMPILE)objcopy
 OBJDUMP     = $(CROSS_COMPILE)objdump
 
-CFLAGS := -Wall -nostdlib -nostartfiles -ffreestanding -Iinclude -mgeneral-regs-only
+CFLAGS := -Wall -nostdlib -nostartfiles -ffreestanding -mgeneral-regs-only
 
 LINK_SCRIPT := $(BUILD_ROOT)/kernel.lds
 LDFLAGS :=  -T $(LINK_SCRIPT)
@@ -62,13 +62,14 @@ endif
 
 $(IMG): $(ELF)
 	$(OBJCOPY) $^ -O binary $@
+	$(OBJDUMP) -D $^ > $(@:.img=.dis)
 
 $(ELF): $(LINK_OBJ) $(LINK_SCRIPT)
 	@echo "------------------------------- build $(VERSION) version  ------------------------------------"
 	$(LD) $(LDFLAGS) -o $@ $(filter %.o, $^)
 
 $(LINK_OBJ_DIR)/%_S.o: %.S
-	$(CC) $(CFLAGS) -I$(INCLUDE_PATH) -o $@ -c $(filter %.S, $^)
+	$(CC) -I$(INCLUDE_PATH) -o $@ -c $(filter %.S, $^)
 
 $(LINK_OBJ_DIR)/%_c.o: %.c
 	$(CC) $(CFLAGS) -I$(INCLUDE_PATH) -o $@ -c $(filter %.c, $^)
