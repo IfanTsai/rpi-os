@@ -22,6 +22,10 @@ SECTIONS
     bss_end = .;
 
     . = ALIGN(0x1000);
+    fb_start = .;
+    .data.fb : { . += (1920 * 1080 * 4); }
+
+    . = ALIGN(0x1000);
     pg_dir = .;
     .data.pgd : { . += (3 * (1 << 12)); }
 }
