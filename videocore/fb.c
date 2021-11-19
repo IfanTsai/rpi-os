@@ -5,9 +5,6 @@
 #include "peripherals/base.h"
 #include "terminal.h"
 
-// the buffer must be 16-byte aligned as only upper 28bits of the address can be passed via the mailbox
-static volatile unsigned int __attribute__((aligned(16))) mbox[36];
-
 static unsigned int width, height, pitch, isrgb;
 static unsigned char *fb;
 
@@ -58,7 +55,7 @@ void fb_init()
     mbox[34] = MBOX_TAG_LAST;
 
     // check call is successful and we have a pointer with depth 32
-    if (mbox_call(MBOX_CH_PROP, mbox) && mbox[20] == 32 && mbox[28]) {
+    if (mbox_call(MBOX_CH_PROP) && mbox[20] == 32 && mbox[28]) {
         mbox[28] &= 0x3fffffff;  // convert GPU address to ARM address
         width  = mbox[5];       // actual physical width
         height = mbox[6];       // actual physical height

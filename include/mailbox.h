@@ -15,6 +15,7 @@
 #define MBOX_TAG_GETFB        0x40001
 #define MBOX_TAG_GETPITCH     0x40008
 #define MBOX_TAG_LAST         0x00000
+#define MBOX_TAG_GETSERIAL    0x10004
 
 enum {
     MBOX_CH_POWER = 0,
@@ -28,7 +29,9 @@ enum {
     MBOX_CH_PROP  = 8,  // request from ARM for response by VideoCore
 };
 
+extern volatile unsigned int mbox[36];;
 
-bool mbox_call(byte ch, volatile unsigned int *mbox);
+bool mbox_call(byte channel);
+unsigned long get_board_serial();
 
 #endif // !__MAILBOX_H__

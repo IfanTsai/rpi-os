@@ -12,7 +12,7 @@ BUILD_DIR = $(BUILD_ROOT)/kernel/ \
             $(BUILD_ROOT)/timer/ \
             $(BUILD_ROOT)/irq/ \
             $(BUILD_ROOT)/mm/ \
-            $(BUILD_ROOT)/fb/ \
+            $(BUILD_ROOT)/videocore/ \
             $(BUILD_ROOT)/user/ \
             $(BUILD_ROOT)/boot/ \
 

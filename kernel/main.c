@@ -10,6 +10,7 @@
 #include "errno.h"
 #include "user.h"
 #include "fb.h"
+#include "mailbox.h"
 
 static void kernel_process()
 {
@@ -41,7 +42,9 @@ void start_kernel()
     enable_interrupt_controller();
     enable_irq();
 
-    printf("\r\nprocessor id = %d\r\n", get_processor_id());
+    printf("\r\n\r\n");
+    printf("board serial = 0x%016x\r\n", get_board_serial());
+    printf("processor id = %d\r\n", get_processor_id());
     printf("el = %d\r\n", get_el());
 
     int pid = copy_process(PF_KTHREAD, (unsigned long)&kernel_process, 0, 0); // start init kernel process
