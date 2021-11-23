@@ -2,7 +2,8 @@
 #define __SCHED_H__
 
 
-#define THREAD_CPU_CONTEXT 0       // offset of cpu_context in task_struct
+#define TASK_CPU_CONTEXT_OFFSET       (offsetof(task_struct_t, cpu_context))
+#define TASK_FP_SIMD_CONTEXT_OFFSET   (offsetof(task_struct_t, fp_simd_context))
 
 #ifndef __ASSEMBLER__
 
@@ -46,7 +47,14 @@ typedef struct {
 } mm_struct_t;
 
 typedef struct {
+    __uint128_t v[32];  // v0 - v31
+    unsigned int fpsr;
+    unsigned int fpcr;
+} fp_simd_context_t;
+
+typedef struct {
     cpu_context_t cpu_context;
+    fp_simd_context_t fp_simd_context;
     long state;
     long counter;
     long priority;
@@ -60,17 +68,11 @@ typedef struct {
 #endif
 } task_struct_t;
 
-#if 0
 #define INIT_TASK { \
-/* cpu context */ { 0 },  \
-/* state etc */ 0, 0, 1, 0, \
-}
-#endif
-
-#define INIT_TASK \
-/* cpu_context */ { { 0 }, \
+/* cpu_context */ { 0 }, \
+/* fpsimd_context */ { { 0 }, 0, 0}, \
 /* state etc */ 0, 0, 1, 0, PF_KTHREAD, \
-/* mm */ { 0, 0, {{ 0 }}, 0, { 0 }} \
+/* mm */ { 0, 0, { { 0 } }, 0, { 0 } }  \
 }
 
 extern task_struct_t *current;
@@ -90,7 +92,7 @@ static inline void preempt_enable()
 unsigned int get_free_pid();
 void ret_from_fork();
 void switch_to(task_struct_t *next);
-void cpu_switch_to(task_struct_t *prev, task_struct_t *next);
+void cpu_switch_to(task_struct_t *prev, task_struct_t *next, unsigned int cpu_context_off, unsigned int fp_simd_context_off);
 void schedule();
 void timer_tick();
 void exit_process();

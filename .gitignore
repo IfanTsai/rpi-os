@@ -61,5 +61,6 @@ dkms.conf
 *.bin
 *.elf
 *.dis
+.ccls-cache/
 
 # End of https://www.toptal.com/developers/gitignore/api/c

@@ -1,8 +1,13 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#define offsetof(TYPE, MEMBER)  \
+            ( (size_t)&( (TYPE *)0 )->MEMBER )
+
+#define ARRAY_SIZE(ARRAY)  \
+            ( sizeof(ARRAY) / sizeof( (ARRAY)[0] ) )
+
 #define NULL  ((void *)0)
-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 typedef unsigned char byte;
 
 #define true 1

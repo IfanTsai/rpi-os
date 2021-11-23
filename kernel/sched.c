@@ -73,7 +73,7 @@ void switch_to(task_struct_t *next)
 #endif
     set_pgd(next->mm.pgd);
 
-    cpu_switch_to(prev, next);
+    cpu_switch_to(prev, next, TASK_CPU_CONTEXT_OFFSET, TASK_FP_SIMD_CONTEXT_OFFSET);
 }
 
 void schedule_tail()

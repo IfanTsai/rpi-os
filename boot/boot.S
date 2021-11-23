@@ -32,6 +32,10 @@ master:
     ldr x0, =SPSR_VALUE
     msr spsr_el3, x0   //  disable all interruot, set AArch64 state is EL1h
 
+    // <<ARM Architecture Reference Manual ARMv8>> D12.2.29
+    ldr x0, =CPACR_VALUE
+    msr cpacr_el1, x0  // allow EL1 use FP/SMID
+
     // <<ARM Architecture Reference Manual ARMv8>> C5.2.6
     adr x0, el1_entry
     msr elr_el3, x0    //  set EL3 exception returns address

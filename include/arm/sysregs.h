@@ -49,4 +49,12 @@
 #define ESR_ELx_EC_DABT_LOW     0x24
 #define ESR_ELx_EC_DABT_CUR     0x25
 
+
+// **************************************************************
+// CPACR_EL1, Architecture Feature Access Control Register (EL1)
+// **************************************************************
+
+#define	CPACR_FP_SIMD_NO_TRAP   (3 << 20)
+#define CPACR_VALUE             CPACR_FP_SIMD_NO_TRAP
+
 #endif  // !__ARM_SYSREGS_H__

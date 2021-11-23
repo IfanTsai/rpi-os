@@ -10,7 +10,7 @@ STRIP       = $(CROSS_COMPILE)strip
 OBJCOPY     = $(CROSS_COMPILE)objcopy
 OBJDUMP     = $(CROSS_COMPILE)objdump
 
-CFLAGS := -Wall -nostdlib -nostartfiles -ffreestanding -mgeneral-regs-only
+CFLAGS := -Wall -nostdlib -nostartfiles -ffreestanding
 
 LINK_SCRIPT := $(BUILD_ROOT)/kernel.lds
 LDFLAGS :=  -T $(LINK_SCRIPT)
