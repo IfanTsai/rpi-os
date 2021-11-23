@@ -4,7 +4,7 @@ typedef void (*putcf)(void *, char);
 static putcf stdout_putf;
 static void *stdout_putp;
 
-static void uli2a(unsigned long int num, unsigned int base, int uc, char *bf)
+static int uli2a(unsigned long int num, unsigned int base, int uc, char *bf)
 {
     int n = 0;
     unsigned int d = 1;
@@ -23,6 +23,8 @@ static void uli2a(unsigned long int num, unsigned int base, int uc, char *bf)
     }
 
     *bf = 0;
+
+    return n;
 }
 
 static inline void li2a(long num, char *bf)
@@ -79,13 +81,29 @@ static char a2i(char ch, char **src, int base, int *nump)
     return ch;
 }
 
+static void f2a(double num, unsigned int base, int uc, int w, int f, char *bf)
+{
+    int n = uli2a((unsigned long int)num, base, uc, bf);
+    *(bf + n) = '.';
+    n++;
+
+    for (int i = 0; i < f; i++) {
+        int t = num * 10;
+        bf[n + i] = (t % 10) + '0';
+        num *= 10;
+    }
+
+
+    *(bf + n + f) = 0;
+}
+
 static void putchw(void *putp, putcf putf, int n, char z, char *bf)
 {
     char fc = z ? '0' : ' ';
     char ch;
     char *p = bf;
 
-    while (*p++ && n > 0)
+    while (*p && *p++ != '.' && n > 0)
         n--;
 
     while (n-- > 0)
@@ -97,7 +115,7 @@ static void putchw(void *putp, putcf putf, int n, char z, char *bf)
 
 void tfp_format(void *putp, putcf putf, char *fmt, va_list va)
 {
-    char bf[12];
+    char bf[32];
     char ch;
 
     while ((ch = *(fmt++))) {
@@ -106,6 +124,7 @@ void tfp_format(void *putp, putcf putf, char *fmt, va_list va)
         else {
             char lz = 0, lng = 0;
             int w = 0;
+            int f = 2;
             ch = *(fmt++);
 
             if (ch == '0') {
@@ -115,6 +134,11 @@ void tfp_format(void *putp, putcf putf, char *fmt, va_list va)
 
             if (ch >= '0' && ch <= '9')
                 ch = a2i(ch, &fmt, 10, &w);
+
+            if (ch == '.') {
+                ch = *(fmt++);
+                ch = a2i(ch, &fmt, 10, &f);
+            }
 
             if (ch == 'l') {
                 ch = *(fmt++);
@@ -129,7 +153,7 @@ void tfp_format(void *putp, putcf putf, char *fmt, va_list va)
                     uli2a(va_arg(va, unsigned long int), 10, 0, bf);
                 else
                     uli2a(va_arg(va, unsigned int), 10, 0, bf);
-                
+
                 putchw(putp, putf, w, lz, bf);
 
                 break;
@@ -162,6 +186,11 @@ void tfp_format(void *putp, putcf putf, char *fmt, va_list va)
                 putchw(putp, putf, w, 0, va_arg(va, char *));
 
                 break;
+            case 'f':
+                f2a(va_arg(va, double), 10, 0, w, f, bf);
+
+                putchw(putp, putf, w, lz, bf);
+                break;
             case '%':
                 putf(putp, ch);
             default:
@@ -189,7 +218,7 @@ void tfp_printf(char *fmt, ...)
 }
 
 static inline void putcp(void *p, char c)
-{ 
+{
     *(*((char **)p))++ = c;
 }
 

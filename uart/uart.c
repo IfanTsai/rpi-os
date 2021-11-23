@@ -14,9 +14,9 @@ void uart_init()
     selector |= 0x2 << 15;                      // set alternate function 5(RXD1) for gpio15
     put32(GPFSEL1, selector);
 
-    put32(GPPUD, 0x00);                         // disable pull-up/down
+    put32(GPPUD, 0x0);                         // disable pull-up/down
     delay(150);                                 // wait 150 cycles  – this provides the required set-up time for the control signal
-    put32(GPPUDCLK0,(0x1 << 14) | (0x1 << 15)); // write to GPPUDCLK0 to clock the control signal into the GPIO pads
+    put32(GPPUDCLK0, (0x1 << 14) | (0x1 << 15)); // write to GPPUDCLK0 to clock the control signal into the GPIO pads
     delay(150);                                 // wait 150 cycles
     put32(GPPUDCLK0, 0x0);                      // remove the clock
 
@@ -28,7 +28,9 @@ void uart_init()
     // baudrate = system_clock_freq / (8 * ( baudrate_reg + 1 )) , system_clock_freq = 250 MHz
     put32(AUX_MU_BAUD_REG, 270);                // set baud rate to 115200
 
-    put32(AUX_MU_CNTL_REG, 0x3);                  // finally, enable transmitter and receiver
+    put32(AUX_MU_IIR_REG, 0x11 << 1);           // clear FIFO
+
+    put32(AUX_MU_CNTL_REG, 0x3);                // finally, enable transmitter and receiver
 }
 
 void uart_putc(char c)
