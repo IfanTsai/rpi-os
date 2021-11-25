@@ -17,7 +17,7 @@
 #define SECTION_SIZE            (1 << SECTION_SHIFT)   // 2M
 
 #define LOW_MEMORY              (2 * SECTION_SIZE)     // 4M
-#define HIGH_MEMORY             DEVICE_BASE
+#define HIGH_MEMORY             DEVICE_PHY_BASE
 
 #define PAGING_MEMORY           (HIGH_MEMORY - LOW_MEMORY)
 #define PAGING_PAGES            (PAGING_MEMORY / PAGE_SIZE)

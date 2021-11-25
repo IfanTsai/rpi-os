@@ -52,7 +52,7 @@ skip_clean_bss:
     bl __create_page_tables
 
     mov x0, #VA_START
-    add sp, x0, #LOW_MEMORY  // set stack virtual address 
+    add sp, x0, #LOW_MEMORY  // set stack virtual address
 
     adrp x0, pg_dir
     msr ttbr1_el1, x0       // load page dir
@@ -77,18 +77,24 @@ clean_bss:
     bne clean_bss
     ret
 
-    .macro create_pgd_entry, tbl, virt, tmp1, tmp2
-    create_table_entry \tbl, \virt, PGD_SHIFT, \tmp1, \tmp2
-    create_table_entry \tbl, \virt, PUD_SHIFT, \tmp1, \tmp2
+    .macro create_pgd_entry, tbl, virt, tmp1, tmp2, tmp3
+    create_table_entry \tbl, \virt, PGD_SHIFT, \tmp1, \tmp2, \tmp3
+    create_table_entry \tbl, \virt, PUD_SHIFT, \tmp1, \tmp2, \tmp3
     .endm   // end .macro  create_pgd_entry
 
-    .macro create_table_entry, tbl, virt, shift, tmp1, tmp2
+    .macro create_table_entry, tbl, virt, shift, tmp1, tmp2, tmp3
     lsr \tmp1, \virt, #\shift
     and \tmp1, \tmp1, #PTRS_PER_TABLE - 1        // table index  (PGD Index or PUD Index)
-    add \tmp2, \tbl, #PAGE_SIZE                  // next page table index (if tbl is PGD table, next table is PUD table)
+    add \tmp3, \tmp1, #1                         // index + 1
+    mov \tmp2, #PAGE_SIZE
+    // next page table = \tbl + PAGE_SIZE * (index + 1)
+    madd \tmp2, \tmp3, \tmp2, \tbl               // next page table index (if tbl is PGD table, next table is PUD table)
     orr \tmp2, \tmp2, #MM_TYPE_PAGE_TABLE        // generate page entry descriptor
     str \tmp2, [\tbl, \tmp1, lsl #3]             // * (table + index x 8) = page entry
-    add \tbl, \tbl, #PAGE_SIZE                   // next level table page
+    add \tmp1, \tmp1, #1
+    mov \tmp2, #PAGE_SIZE
+    // \tbl = \tbl + PAGE_SIZE x ( index + 1 )
+    madd \tbl, \tmp1, \tmp2, \tbl               // next level table page
     .endm   // end .macro create_table_entry
 
     .macro create_block_map, tbl, phys, start, end, flags, tmp1
@@ -145,7 +151,7 @@ clean_bss:
 /**
  * in order to map 1G memory, I just use 3 page: 1 PGD, 1 PUD and 1 PMD, I put them in contiguous memory
  * and we use block memroy mapping, the block size is 2MB
- */ 
+ */
 __create_page_tables:
     mov x29, x30                         // save return address
 
@@ -155,19 +161,30 @@ __create_page_tables:
 
     adrp x0, pg_dir
     mov x1, #VA_START
-    create_pgd_entry x0, x1, x2, x3   // x2, x3 is temp register
+    create_pgd_entry x0, x1, x2, x3, x4  // x2, x3 x4 is temp register
 
-    /* Mapping kernel and init stack */
+    /* Mapping kernel and init stack 0x0 - 0x3f000000 */
     mov x1, xzr                         // start mapping from physical offset 0
     mov x2, #VA_START                   // first virtual address
-    ldr x3, =(VA_START + DEVICE_BASE - SECTION_SIZE)  // last virtual address
+    ldr x3, =(VA_START + DEVICE_PHY_BASE - SECTION_SIZE)  // last virtual address
     create_block_map x0, x1, x2, x3, MMU_FLAGS, x4   // x0: PMD table, x4: temp register
 
-    /* Mapping device memory*/
-    mov x1, #DEVICE_BASE                         // start mapping from device address
-    ldr x2, =(VA_START + DEVICE_BASE)            // first virtual address
+    /* Mapping device memory 0x3f000000 - 0x40000000 */
+    mov x1, #DEVICE_PHY_BASE                         // start mapping from device address
+    ldr x2, =(VA_START + DEVICE_PHY_BASE)            // first virtual address
     ldr x3, =(VA_START + PHYS_MEMORY_SIZE - SECTION_SIZE)   // last virtual address
     create_block_map x0, x1, x2, x3, MMU_DEVICE_FLAGS, x4
 
-    mov	x30, x29                                     // restore return address
+    /* inorder to map 0x40000000 - 0x80000000 (1GB), need to create another PUD entry and PMD page */
+    sub x0, x0, #PAGE_SIZE                            // PUD table address
+    ldr x1, =(VA_START + PERIPHERAL_PHY_BASE)
+    create_table_entry x0, x1, PUD_SHIFT, x2, x3, x4
+
+    /* Mapping device memory 0x40000000 - 0x80000000 */
+    mov x1, #PERIPHERAL_PHY_BASE                         // start mapping from device address
+    ldr x2, =(VA_START + PERIPHERAL_PHY_BASE)            // first virtual address
+    ldr x3, =(VA_START + PERIPHERAL_PHY_BASE + PHYS_MEMORY_SIZE - SECTION_SIZE)   // last virtual address
+    create_block_map x0, x1, x2, x3, MMU_DEVICE_FLAGS, x4
+
+    mov x30, x29                                        // restore return address
     ret

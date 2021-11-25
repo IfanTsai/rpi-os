@@ -14,9 +14,13 @@
 #define DISABLE_IRQS_2      (PBASE + 0x0000B220)
 #define DISABLE_BASIC_IRQS  (PBASE + 0x0000B224)
 
+#define CORE0_INT_SOURCE    (PERIPHERAL_BASE + 0x60)
+
 #define SYSTEM_TIMER_IRQ_0  (1 << 0)
 #define SYSTEM_TIMER_IRQ_1  (1 << 1)
 #define SYSTEM_TIMER_IRQ_2  (1 << 2)
 #define SYSTEM_TIMER_IRQ_3  (1 << 3)
+#define GPU_IRQ             (1 << 8)
+#define LOCAL_TIME_IRQ      (1 << 11)
 
 #endif  // !__P_IRQ_H__
