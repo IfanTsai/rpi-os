@@ -11,6 +11,7 @@
 #include "user.h"
 #include "fb.h"
 #include "mailbox.h"
+#include "power.h"
 
 static void kernel_process()
 {
@@ -31,6 +32,13 @@ static void draw_logo()
     draw_str(900, 540, "Hello RPI OS!", 0x05);
 }
 
+static void local_timer_cb()
+{
+    set_onboard_led_status(!get_onboard_led_status());
+    printf("\r\n core temperature: %.3fC\r\n", get_core_temperature());
+    add_timer(1000 * 5, local_timer_cb);
+}
+
 void start_kernel()
 {
     uart_init();
@@ -38,7 +46,9 @@ void start_kernel()
     exception_vector_table_init();
     fb_init();
     draw_logo();
-    timer_init(200000);
+    sys_timer_init(20000);
+    local_timer_init();
+    add_timer(1000 * 5, local_timer_cb);
     enable_interrupt_controller();
     enable_irq();
 
