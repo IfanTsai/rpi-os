@@ -14,6 +14,7 @@ BUILD_DIR = $(BUILD_ROOT)/kernel/ \
             $(BUILD_ROOT)/mm/ \
             $(BUILD_ROOT)/videocore/ \
             $(BUILD_ROOT)/user/ \
+            $(BUILD_ROOT)/power/ \
             $(BUILD_ROOT)/boot/ \
 
 export DEBUG = false
