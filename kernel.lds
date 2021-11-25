@@ -27,5 +27,5 @@ SECTIONS
 
     . = ALIGN(0x1000);
     pg_dir = .;
-    .data.pgd : { . += (3 * (1 << 12)); }
+    .data.pgd : { . += (4 * (1 << 12)); }
 }
