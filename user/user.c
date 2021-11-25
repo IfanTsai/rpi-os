@@ -9,7 +9,7 @@ void loop(char* str)
         for (int i = 0; i < 5; i++) {
             buf[0] = str[i];
             write(buf);
-            user_delay(1000000);
+            user_delay(100000);
         }
     }
 }

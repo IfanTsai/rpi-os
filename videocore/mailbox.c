@@ -47,3 +47,82 @@ unsigned long get_board_serial()
 
     return ((unsigned long)mbox[6] << 32) + mbox[5];
 }
+
+double get_core_temperature()
+{
+    mbox[0] = 8 * 4;                // length of the message
+    mbox[1] = MBOX_REQUEST;         // this is a request message
+
+    mbox[2] = MBOX_TAG_GETTEMP;     // get core temperature
+    mbox[3] = 8;                    // buffer size
+    mbox[4] = 4;
+    mbox[5] = 0;
+    mbox[6] = 0;
+
+    mbox[7] = MBOX_TAG_LAST;
+
+    if (!mbox_call(MBOX_CH_PROP)) {
+        printf("failed to get core temperature\r\n");
+
+        return 0;
+    }
+
+    return mbox[6] / 1000.0;
+}
+
+/**
+ * @brief Set the onboard led (green) status
+ *
+ * @param status true: on, false: off
+ * @return true: on
+ * @return false: off
+ */
+bool set_onboard_led_status(bool status)
+{
+    mbox[0] = 8 * 4;                // length of the message
+    mbox[1] = MBOX_REQUEST;         // this is a request message
+
+    mbox[2] = MBOX_TAG_SETLED;      // set led status
+    mbox[3] = 8;                    // buffer size
+    mbox[4] = 8;
+    mbox[5] = 130;                  // green led
+    mbox[6] = status;
+
+    mbox[7] = MBOX_TAG_LAST;
+
+    if (!mbox_call(MBOX_CH_PROP)) {
+        printf("failed to set led status\r\n");
+
+        return 0;
+    }
+
+    return (bool)mbox[6];
+}
+
+/**
+ * @brief Get the onboard led (green) status
+ *
+ * @return true: on
+ * @return false: off
+ */
+bool get_onboard_led_status()
+{
+    mbox[0] = 8 * 4;                // length of the message
+    mbox[1] = MBOX_REQUEST;         // this is a request message
+
+    mbox[2] = MBOX_TAG_GETLED;      // set led status
+    mbox[3] = 8;                    // buffer size
+    mbox[4] = 8;
+    mbox[5] = 130;                  // green led
+    mbox[6] = 0;
+
+    mbox[7] = MBOX_TAG_LAST;
+
+    if (!mbox_call(MBOX_CH_PROP)) {
+        printf("failed to get led status\r\n");
+
+        return 0;
+    }
+
+    return (bool)mbox[6];
+}

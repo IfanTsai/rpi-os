@@ -14,8 +14,13 @@
 #define MBOX_TAG_SETPXLORDR   0x48006
 #define MBOX_TAG_GETFB        0x40001
 #define MBOX_TAG_GETPITCH     0x40008
-#define MBOX_TAG_LAST         0x00000
 #define MBOX_TAG_GETSERIAL    0x10004
+#define MBOX_TAG_GETTEMP      0x30006
+#define MBOX_TAG_GETVOLTAGE   0x30003
+#define MBOX_TAG_GETLED       0x30041
+#define MBOX_TAG_SETLED       0x38041
+
+#define MBOX_TAG_LAST         0x00000
 
 enum {
     MBOX_CH_POWER = 0,
@@ -33,5 +38,8 @@ extern volatile unsigned int mbox[36];;
 
 bool mbox_call(byte channel);
 unsigned long get_board_serial();
+double get_core_temperature();
+bool set_onboard_led_status(bool status);
+bool get_onboard_led_status();
 
 #endif // !__MAILBOX_H__
