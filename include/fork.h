@@ -14,7 +14,10 @@
 #define PSTATE_MODE_EL3t   0x0000000c
 #define PSTATE_MODE_EL3h   0x0000000d
 
-/* this structure used under save_registers and store_registers */
+/* 
+ * this structure used under kernel_entry and kernel_exit,
+ * will first set in current task via copy_process, then copy and set via fork
+*/
 typedef struct {
     unsigned long regs[31];  // x0 - x30
     unsigned long sp;        // sp_or sp_el0

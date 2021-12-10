@@ -5,7 +5,7 @@
 
 typedef void (*local_timer_func)();
 
-typedef struct timer {
+typedef struct {
     unsigned long ms;
     local_timer_func cb;
     bool valid;

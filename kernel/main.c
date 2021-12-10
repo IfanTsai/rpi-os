@@ -39,7 +39,7 @@ static void local_timer_cb()
     add_timer(1000 * 5, local_timer_cb);
 }
 
-void start_kernel()
+void kernel_main()
 {
     uart_init();
     printf_init(NULL, putc);

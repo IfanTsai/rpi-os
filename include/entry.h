@@ -26,6 +26,6 @@
 
 #define SYNC_ERROR              16
 #define SYSCALL_ERROR           17
-#define DATA_ABORT_ERROR		18
+#define DATA_ABORT_ERROR        18
 
 #endif

@@ -64,7 +64,7 @@ skip_clean_bss:
     msr mair_el1, x0        // set page attributes
 
     // load linker address, must be loaded before MMU is enabled, because PC will use address translation after MMU is enabled
-    ldr x2, =start_kernel
+    ldr x2, =kernel_main
 
     mov x0, #SCTLR_MMU_ENABLED
     msr sctlr_el1, x0       // enable MMU
