@@ -17,7 +17,7 @@ SECTIONS
 
     . = ALIGN(0x8);
     bss_start = .;
-    .bss : { *(.bss*) } 
+    .bss : { *(.bss*) }
     . = ALIGN(0x8);
     bss_end = .;
 

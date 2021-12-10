@@ -7,7 +7,7 @@
     b \label
     .endm  // end .macro ventry
 
-    .macro save_registers, el
+    .macro kernel_entry, el
     sub sp, sp, #REGISTER_FRAME_SIZE
     stp x0,  x1,  [sp, #16 * 0]
     stp x2,  x3,  [sp, #16 * 1]
@@ -40,9 +40,9 @@
     bl set_register_stack
     bl print_memory_layout
 #endif
-    .endm    // end .macro save_registers, el
+    .endm    // end .macro kernel_entry, el
 
-    .macro restore_registers, el
+    .macro kernel_exit, el
     ldp x22, x23, [sp, #16 * 16]
     ldp x30, x21, [sp, #16 * 15]
 
@@ -74,10 +74,10 @@
     bl print_memory_layout
 #endif
     eret
-    .endm // end .macro restore_registers, el
+    .endm // end .macro kernel_exit, el
 
     .macro handle_invalid_entry el, type
-    save_registers \el
+    kernel_entry \el
     mov x0, #\type
     mrs x1, esr_el1    // the reason for the exception is saved in the esr_elx
     mrs x2, elr_el1    // the return address is saved in elr_elx 
@@ -152,7 +152,7 @@ error_invalid_el0_32:
     handle_invalid_entry 0, ERROR_INVALID_EL0_32
 
 el_sync:
-    save_registers 1
+    kernel_entry 1
     mrs x1, esr_el1
     lsr x24, x1, #ESR_ELx_EC_SHIFT // exception class
     cmp x24, #ESR_ELx_EC_DABT_CUR
@@ -162,17 +162,17 @@ el1_da:
     handle_invalid_entry 1, DATA_ABORT_ERROR
 
 el1_irq:
-    save_registers 1
+    kernel_entry 1
     bl handle_irq
-    restore_registers 1
+    kernel_exit 1
 
 el0_irq:
-    save_registers 0
+    kernel_entry 0
     bl handle_irq
-    restore_registers 0
+    kernel_exit 0
 
 el0_sync:
-    save_registers 0
+    kernel_entry 0
     mrs x25, esr_el1
     lsr x24, x25,  #ESR_ELx_EC_SHIFT   // exception class
     cmp x24, #ESR_ELx_EC_SVC64
@@ -192,7 +192,7 @@ el0_da:
     handle_invalid_entry 0, DATA_ABORT_ERROR
 1:
     bl disable_irq
-    restore_registers 0
+    kernel_exit 0
 
 sc_nr  .req x25   // the number of system calls
 sc_no  .req x26   // system call number
@@ -211,7 +211,7 @@ el0_svc:
 
     bl disable_irq
     str x0, [sp, #S_X0]
-    restore_registers 0
+    kernel_exit 0
 
 err_sys:
     handle_invalid_entry 0, SYSCALL_ERROR
@@ -226,7 +226,7 @@ ret_from_fork:
 
 ret_to_user:
     bl disable_irq
-    restore_registers 0    // call eret to switch to user mode
+    kernel_exit 0    // call eret to switch to user mode
 
 err_hang:
     wfi
